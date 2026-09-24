@@ -227,7 +227,13 @@ static char key(void){
 }
 
 void kmain(void){
-    serial_init();clear_screen();arch_init();proc_init();
+    serial_init();
+    puts("EARLY: serial console online.\\n");
+    clear_screen();
+    puts("EARLY: console memory online.\\n");
+    arch_init();
+    puts("ARCH: GDT/IDT/TSS online.\\n");
+    proc_init();
     puts("\nLietY2 2.0 — The Operating System Nobody Ordered\n");
     puts("REAL kernel / REAL disk / REAL LYFS / REAL ring3 / REAL syscall / ZERO good reasons\n");
     puts("\nDetecting disk... ");if(disk_init())puts(disk_backend());else puts("NONE");putc('\n');
