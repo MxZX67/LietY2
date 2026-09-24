@@ -1,25 +1,58 @@
 name: build-LietY2
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc binutils grub-pc-bin grub-common xorriso qemu-system-x86
+          sudo apt-get install -y gcc binutils grub-pc-bin grub-common xorriso mtools qemu-system-x86
+
       - name: Build real bootable ISO
         run: make
+
       - name: Verify 20 GiB logical ISO
-        run: test "$(stat -c%s LietY2-x86_64.iso)" -eq 21474836480
-      - name: QEMU boot smoke test
         run: |
-          timeout 8s qemu-system-x86_64 -m 128M -cdrom LietY2-x86_64.iso -serial stdio -display none > qemu.log 2>&1 || true
-          grep -q "LietY2 0.1" qemu.log
-          grep -q "DOS-ish shell" qemu.log
+          test -f LietY2-x86_64.iso
+          test "$(stat -c%s LietY2-x86_64.iso)" -eq 21474836480
+          du -h LietY2-x86_64.iso
+
+      - name: Prepare persistent test disk
+        run: truncate -s 64M LietY2-disk.img
+
+      - name: QEMU boot + AHCI + LYFS + ring3 + syscall smoke test
+        shell: bash
+        run: |
+          set +e
+          timeout 12s qemu-system-x86_64 \
+            -M q35 -m 128M \
+            -cdrom LietY2-x86_64.iso \
+            -drive file=LietY2-disk.img,if=none,id=disk,format=raw \
+            -device ich9-ahci,id=sata0 \
+            -device ide-hd,bus=sata0.0,drive=disk \
+            -serial stdio -display none -boot d > qemu.log 2>&1
+          rc=$?
+          set -e
+          cat qemu.log
+          test "$rc" -eq 124 -o "$rc" -eq 0
+          grep -q "LietY2 2.0" qemu.log
+          grep -q "LYFS mounted." qemu.log
+          grep -q "Starting INIT in ring 3" qemu.log
+          grep -q "INIT.LYE: jestem w ring3." qemu.log
+          grep -q "filesystem syscall dzialaja" qemu.log
+          grep -q "RING3.TXT" qemu.log
+
       - uses: actions/upload-artifact@v4
         with:
-          name: LietY2-x86_64
-          path: LietY2-x86_64.iso
+          name: LietY2-build
+          path: |
+            build/kernel.elf
+            qemu.log
