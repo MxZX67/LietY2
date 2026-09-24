@@ -8,13 +8,13 @@
 .word 0
 .long 8
 
+.code32
 .section .text
 .global _start
 .global arch_load_gdt
 .global arch_load_idt
 .global enter_user
 .global syscall_int80
-.global setup_paging
 .global user_resume_rsp
 .type _start,@function
 _start:
@@ -22,10 +22,70 @@ _start:
     mov $0xE9,%dx
     mov $0x53,%al
     out %al,%dx
-    mov $stack_top, %rsp
-    and $-16, %rsp
+    mov $boot_stack_top,%esp
+    and $-16,%esp
+    call setup_paging32
+    lgdt gdt64_ptr
     mov $0xE9,%dx
-    mov $0x50,%al
+    mov $0x4C,%al
+    out %al,%dx
+    ljmp $0x08,$long_mode_start
+
+.type setup_paging32,@function
+setup_paging32:
+    mov $pml4,%edi
+    xor %eax,%eax
+    mov $3072/4,%ecx
+    rep stosl
+
+    mov $pdpt,%eax
+    or $0x7,%eax
+    mov %eax,pml4
+    mov $pd,%eax
+    or $0x7,%eax
+    mov %eax,pdpt
+
+    xor %ecx,%ecx
+1:
+    mov %ecx,%eax
+    shl $21,%eax
+    or $0x87,%eax
+    mov %eax,pd(,%ecx,8)
+    movl $0,pd+4(,%ecx,8)
+    inc %ecx
+    cmp $512,%ecx
+    jb 1b
+
+    mov $pml4,%eax
+    mov %eax,%cr3
+    mov %cr4,%eax
+    or $0x20,%eax
+    mov %eax,%cr4
+
+    mov $0xC0000080,%ecx
+    rdmsr
+    or $0x100,%eax
+    wrmsr
+
+    mov %cr0,%eax
+    or $0x80000000,%eax
+    mov %eax,%cr0
+    ret
+
+.code64
+.type long_mode_start,@function
+long_mode_start:
+    mov $0x10,%ax
+    mov %ax,%ds
+    mov %ax,%es
+    mov %ax,%ss
+    xor %eax,%eax
+    mov %ax,%fs
+    mov %ax,%gs
+    mov $stack_top,%rsp
+    and $-16,%rsp
+    mov $0xE9,%dx
+    mov $0x4D,%al
     out %al,%dx
     call kmain
     mov $0xE9,%dx
@@ -35,48 +95,19 @@ _start:
     hlt
     jmp 1b
 
-.type setup_paging,@function
-setup_paging:
-    lea pml4(%rip), %rdi
-    lea pdpt(%rip), %rsi
-    lea pd(%rip), %rdx
-    movq $0,(%rdi)
-    movq $0,(%rsi)
-    movq $0,(%rdx)
-    movq %rsi,%rax
-    orq $0x7,%rax
-    movq %rax,(%rdi)
-    movq %rdx,%rax
-    orq $0x3,%rax
-    movq %rax,(%rsi)
-    xor %rcx,%rcx
-2:
-    mov %rcx,%rax
-    shl $21,%rax
-    orq $0x87,%rax
-    mov %rax,(%rdx,%rcx,8)
-    inc %rcx
-    cmp $512,%rcx
-    jb 2b
-    mov %rdi,%rax
-    mov %rax,%cr3
-    ret
+.align 8
+gdt64:
+    .quad 0
+    .quad 0x00AF9A000000FFFF
+    .quad 0x00CF92000000FFFF
+gdt64_end:
+gdt64_ptr:
+    .word gdt64_end-gdt64-1
+    .long gdt64
 
 .type arch_load_gdt,@function
 arch_load_gdt:
-    lgdt (%rdi)
-    pushq $0x08
-    lea 1f(%rip),%rax
-    pushq %rax
-    lretq
-1:
-    mov $0x10,%ax
-    mov %ax,%ds
-    mov %ax,%es
-    mov %ax,%ss
-    xor %eax,%eax
-    mov %ax,%fs
-    mov %ax,%gs
+    lidt (%rdi)
     ret
 
 .type arch_load_idt,@function
@@ -150,6 +181,9 @@ syscall_int80:
 pml4: .skip 4096
 pdpt: .skip 4096
 pd: .skip 4096
+.align 16
+boot_stack: .skip 16384
+boot_stack_top:
 .align 16
 stack: .skip 32768
 stack_top:
