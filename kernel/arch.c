@@ -28,7 +28,7 @@ static uint64_t gdt[7];
 static struct tss64 tss __attribute__((aligned(16)));
 static uint8_t tss_stack[8192] __attribute__((aligned(16)));
 static struct idt_entry idt[256] __attribute__((aligned(16)));
-static struct { uint16_t limit; uint64_t base; } idtr;
+static struct __attribute__((packed)) { uint16_t limit; uint64_t base; } idtr;
 
 static void set_tss_desc(uint64_t base, uint32_t limit){
     uint64_t lo = (uint64_t)(limit & 0xFFFF)
