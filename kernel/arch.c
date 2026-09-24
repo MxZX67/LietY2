@@ -55,8 +55,8 @@ static void set_gate(int n, void *fn, uint8_t attr){
 void arch_init(void){
     gdt[0]=0;
     gdt[1]=0x00AF9A000000FFFFULL;
-    gdt[2]=0x00AF92000000FFFFULL;
-    gdt[3]=0x00AFF2000000FFFFULL;
+    gdt[2]=0x00CF92000000FFFFULL;
+    gdt[3]=0x00CFF2000000FFFFULL;
     gdt[4]=0x00AFFA000000FFFFULL;
 
     tss.rsp0=(uint64_t)(tss_stack+sizeof(tss_stack));
