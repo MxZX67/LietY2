@@ -1,0 +1,27 @@
+name: build-LietY2
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc binutils grub-pc-bin grub-common xorriso qemu-system-x86
+      - name: Build real bootable ISO
+        run: make
+      - name: Verify 20 GiB logical ISO
+        run: test "$(stat -c%s LietY2-x86_64.iso)" -eq 21474836480
+      - name: QEMU boot smoke test
+        run: |
+          timeout 8s qemu-system-x86_64 -m 128M -cdrom LietY2-x86_64.iso -serial stdio -display none > qemu.log 2>&1 || true
+          grep -q "LietY2 0.1" qemu.log
+          grep -q "DOS-ish shell" qemu.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LietY2-x86_64
+          path: LietY2-x86_64.iso
