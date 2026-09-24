@@ -35,7 +35,7 @@ _start:
 setup_paging32:
     mov $pml4,%edi
     xor %eax,%eax
-    mov $3072/4,%ecx
+    mov $24576/4,%ecx
     rep stosl
 
     mov $pdpt,%eax
@@ -44,6 +44,12 @@ setup_paging32:
     mov $pd,%eax
     or $0x7,%eax
     mov %eax,pdpt
+    add $0x1000,%eax
+    mov %eax,pdpt+8
+    add $0x1000,%eax
+    mov %eax,pdpt+16
+    add $0x1000,%eax
+    mov %eax,pdpt+24
 
     xor %ecx,%ecx
 1:
@@ -53,7 +59,7 @@ setup_paging32:
     mov %eax,pd(,%ecx,8)
     movl $0,pd+4(,%ecx,8)
     inc %ecx
-    cmp $512,%ecx
+    cmp $2048,%ecx
     jb 1b
 
     mov $pml4,%eax
@@ -192,7 +198,7 @@ syscall_int80:
 .align 4096
 pml4: .skip 4096
 pdpt: .skip 4096
-pd: .skip 4096
+pd: .skip 16384
 .align 16
 boot_stack: .skip 16384
 boot_stack_top:
