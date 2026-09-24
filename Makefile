@@ -22,7 +22,7 @@ LietY2-x86_64.iso: build/kernel.elf boot/grub/grub.cfg
 	cp build/kernel.elf build/isodir/boot/LietY2.elf
 	cp boot/grub/grub.cfg build/isodir/boot/grub/grub.cfg
 	grub-file --is-x86-multiboot2 build/kernel.elf
-	grub-mkrescue -O i386-pc -o $@ build/isodir
+	grub-mkrescue -o $@ build/isodir
 	truncate -s 20G $@
 
 clean:
