@@ -201,6 +201,7 @@ syscall_int80:
     pop %rdx
     pop %rcx
     pop %rbx
+    add $8,%rsp
     iretq
 3:
     mov user_resume_rsp(%rip),%rsp
