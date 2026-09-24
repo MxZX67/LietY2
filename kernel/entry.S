@@ -20,7 +20,6 @@ _start:
     cli
     mov $stack_top, %rsp
     and $-16, %rsp
-    call setup_paging
     call kmain
 1:
     hlt
