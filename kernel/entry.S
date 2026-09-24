@@ -19,9 +19,18 @@
 .type _start,@function
 _start:
     cli
+    mov $0xE9,%dx
+    mov $0x53,%al
+    out %al,%dx
     mov $stack_top, %rsp
     and $-16, %rsp
+    mov $0xE9,%dx
+    mov $0x50,%al
+    out %al,%dx
     call kmain
+    mov $0xE9,%dx
+    mov $0x48,%al
+    out %al,%dx
 1:
     hlt
     jmp 1b
