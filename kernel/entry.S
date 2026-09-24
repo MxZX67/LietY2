@@ -150,10 +150,16 @@ enter_user:
     pushq %rax
     pushq $0x23
     pushq %rdi
+    mov $0xE9,%dx
+    mov $0x55,%al
+    out %al,%dx
     iretq
 
 .type syscall_int80,@function
 syscall_int80:
+    mov $0xE9,%dx
+    mov $0x4B,%al
+    out %al,%dx
     cld
     push %rax
     push %rbx
@@ -170,11 +176,17 @@ syscall_int80:
     push %r13
     push %r14
     push %r15
-    mov %rsp,%rdi
+    sub $8,%rsp
+    lea 8(%rsp),%rdi
     call syscall_handle
-    test %rax,%rax
-    mov 112(%rsp),%rax
+    mov %rax,%r11
+    mov 120(%rsp),%rax
+    mov $0xE9,%dx
+    mov $0x52,%al
+    out %al,%dx
+    test %r11,%r11
     jnz 3f
+    add $8,%rsp
     pop %r15
     pop %r14
     pop %r13
