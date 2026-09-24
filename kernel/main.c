@@ -11,6 +11,7 @@ static uint8_t attr=0x07;
 static inline void outb(uint16_t p,uint8_t v){__asm__ volatile("outb %0,%1"::"a"(v),"Nd"(p));}
 static inline uint8_t inb(uint16_t p){uint8_t v;__asm__ volatile("inb %1,%0":"=a"(v):"Nd"(p));return v;}
 static void delay(volatile uint64_t n){while(n--)__asm__ volatile("pause");}
+static void debugcon(char c){outb(0xE9,(uint8_t)c);}
 static size_t strlen_local(const char*s){size_t n=0;while(s[n])n++;return n;}
 #define strlen strlen_local
 
@@ -187,6 +188,7 @@ static void command(char*line){
 }
 
 uint64_t syscall_handle(struct syscall_frame*f){
+    if(f->rax>=1&&f->rax<=5) debugcon((char)('0'+f->rax)); else debugcon('?');
     switch(f->rax){
     case 1:{
         uint64_t p=f->rdi,n=f->rsi;
