@@ -44,7 +44,7 @@ user_init:
     hlt
     jmp 2b
 
-.section .user.rodata
+.section .user.rodata,"a",@progbits
 msg: .ascii "INIT.LYE: jestem w ring3.\n"
 .equ msg_len,.-msg
 pidmsg: .ascii "INIT: getpid() i filesystem syscall dzialaja.\n"
