@@ -1,7 +1,7 @@
 CROSS ?=
 CC := $(CROSS)gcc
 LD := $(CROSS)ld
-CFLAGS := -m64 -ffreestanding -fno-pic -fno-stack-protector -fno-asynchronous-unwind-tables -fno-unwind-tables -mno-red-zone -O2 -Wall -Wextra -I.
+CFLAGS := -m64 -ffreestanding -fno-pic -fno-stack-protector -fno-asynchronous-unwind-tables -fno-unwind-tables -mno-red-zone -mno-sse -mno-sse2 -mno-mmx -msoft-float -O2 -Wall -Wextra -I.
 LDFLAGS := -T linker.ld -nostdlib
 OBJS := build/entry.o build/main.o build/arch.o build/disk.o build/fs.o build/proc.o build/user.o
 
