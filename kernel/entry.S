@@ -136,19 +136,19 @@ arch_load_idt:
 .type enter_user,@function
 enter_user:
     mov %rsp,user_resume_rsp(%rip)
-    mov $0x18,%ax
+    mov $0x1B,%ax
     mov %ax,%ds
     mov %ax,%es
     mov %ax,%fs
     mov %ax,%gs
-    pushq $0x18
+    pushq $0x1B
     pushq %rsi
     pushfq
     popq %rax
     and $~0x3200,%rax
     or $0x002,%rax
     pushq %rax
-    pushq $0x20
+    pushq $0x23
     pushq %rdi
     iretq
 
