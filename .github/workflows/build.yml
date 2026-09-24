@@ -54,7 +54,8 @@ jobs:
           grep -q "Starting INIT in ring 3" qemu.log
           grep -q "INIT.LYE: jestem w ring3." qemu.log
           grep -q "filesystem syscall dzialaja" qemu.log
-          grep -q "RING3.TXT" qemu.log
+          grep -q "Ring3 napisal ten plik na prawdziwym dysku." qemu.log
+          grep -q "INIT returned to kernel." qemu.log
 
       - uses: actions/upload-artifact@v4
         with:
