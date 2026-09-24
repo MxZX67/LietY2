@@ -37,7 +37,11 @@ int proc_run_init(void){
     table[slot].pid=next_pid++;table[slot].state=P_RUN;
     table[slot].name[0]='I';table[slot].name[1]='N';table[slot].name[2]='I';table[slot].name[3]='T';table[slot].name[4]=0;
     current_pid=table[slot].pid;
+    int int80_seen=0;
+    for(size_t i=0;i+1<size;i++) if(__user_start[i]==0xCD && __user_start[i+1]==0x80){ int80_seen=1; break; }
     puts("\nStarting INIT in ring 3...\n");
+    if(__user_start[0]==0x48 && int80_seen) puts("USER IMAGE: valid 64-bit code with INT80.\n");
+    else puts("USER IMAGE: invalid or incomplete image.\n");
     enter_user(entry,0x804000);
     table[slot].state=P_ZOMB;
     current_pid=0;
