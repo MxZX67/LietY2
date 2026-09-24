@@ -39,12 +39,15 @@ jobs:
             -device ich9-ahci,id=sata0 \
             -device ide-hd,bus=sata0.0,drive=disk \
             -serial stdio -debugcon file:qemu-debugcon.log -global isa-debugcon.iobase=0xe9 \
-            -display none -boot d -d int,cpu_reset -D qemu-debug.log > qemu.log 2>&1
+            -display none -boot d -d in_asm,int,cpu_reset -D qemu-debug.log > qemu.log 2>&1
           rc=$?
           set -e
           cat qemu.log
           cat qemu-debugcon.log || true
-          cat qemu-debug.log || true
+          echo "--- QEMU exception context ---"
+          grep -n -m 3 -B 12 -A 45 "check_exception" qemu-debug.log || true
+          echo "--- QEMU reset context ---"
+          grep -n -m 3 -B 4 -A 20 "Triple fault" qemu-debug.log || true
           test "$rc" -eq 124 -o "$rc" -eq 0
           grep -q "LietY2 2.0" qemu.log
           grep -q "LYFS mounted." qemu.log
