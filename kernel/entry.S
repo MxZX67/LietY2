@@ -35,7 +35,7 @@ setup_paging:
     movq $0,(%rsi)
     movq $0,(%rdx)
     movq %rsi,%rax
-    orq $0x3,%rax
+    orq $0x7,%rax
     movq %rax,(%rdi)
     movq %rdx,%rax
     orq $0x3,%rax
