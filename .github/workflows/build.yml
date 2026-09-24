@@ -38,10 +38,13 @@ jobs:
             -drive file=LietY2-disk.img,if=none,id=disk,format=raw \
             -device ich9-ahci,id=sata0 \
             -device ide-hd,bus=sata0.0,drive=disk \
-            -serial stdio -display none -boot d > qemu.log 2>&1
+            -serial stdio -debugcon file:qemu-debugcon.log -global isa-debugcon.iobase=0xe9 \
+            -display none -boot d -d int,cpu_reset -D qemu-debug.log > qemu.log 2>&1
           rc=$?
           set -e
           cat qemu.log
+          cat qemu-debugcon.log || true
+          cat qemu-debug.log || true
           test "$rc" -eq 124 -o "$rc" -eq 0
           grep -q "LietY2 2.0" qemu.log
           grep -q "LYFS mounted." qemu.log
@@ -56,3 +59,5 @@ jobs:
           path: |
             build/kernel.elf
             qemu.log
+            qemu-debugcon.log
+            qemu-debug.log
