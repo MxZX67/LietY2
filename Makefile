@@ -21,6 +21,7 @@ LietY2-x86_64.iso: build/kernel.elf boot/grub/grub.cfg
 	mkdir -p build/isodir/boot/grub
 	cp build/kernel.elf build/isodir/boot/LietY2.elf
 	cp boot/grub/grub.cfg build/isodir/boot/grub/grub.cfg
+	command -v mformat >/dev/null 2>&1 || { echo 'LietY2 CI: installing mtools because grub-mkrescue needs mformat'; sudo apt-get update; sudo apt-get install -y mtools; }
 	grub-file --is-x86-multiboot2 build/kernel.elf
 	grub-mkrescue -o $@ build/isodir
 	truncate -s 20G $@
