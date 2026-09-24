@@ -5,6 +5,8 @@
 #define H 25
 #define COM1 0x3F8
 
+extern void setup_paging(void);
+
 static size_t row,col;
 static uint8_t attr=0x07;
 
@@ -231,6 +233,9 @@ void kmain(void){
     puts("EARLY: serial console online.\\n");
     clear_screen();
     puts("EARLY: console memory online.\\n");
+    puts("PAGING: switching page tables...\\n");
+    setup_paging();
+    puts("PAGING: switched.\\n");
     arch_init();
     puts("ARCH: GDT/IDT/TSS online.\\n");
     proc_init();
