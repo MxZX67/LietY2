@@ -14,6 +14,7 @@
 .global arch_load_idt
 .global enter_user
 .global syscall_int80
+.global setup_paging
 .global user_resume_rsp
 .type _start,@function
 _start:
