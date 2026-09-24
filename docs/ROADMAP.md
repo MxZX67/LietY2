@@ -1,36 +1,72 @@
 # LietY2 roadmap
 
-## Implemented baseline
-- Real x86_64 kernel
-- Multiboot2/GRUB boot
-- VGA text console
-- PS/2 keyboard polling
-- COM1 serial console
-- DOS-like command interpreter
-- 20 GiB sparse/logical ISO target
-- Persistent 64 MiB secondary disk image in QEMU
-- CI build + QEMU smoke test
+## 2.0 baseline
 
-## Next kernel milestones
-1. IDT and exception handlers
-2. PIT/APIC timer and preemptive scheduler
-3. physical page allocator + kernel heap
-4. ring 3 + TSS
-5. syscall ABI
-6. ATA PIO + AHCI
-7. persistent LYFS filesystem
-8. executable loader for LYE
-9. per-process page tables
-10. USB HID
-11. framebuffer GUI
-12. installer and disk boot
-13. networking
+- [x] Multiboot2/GRUB boot
+- [x] x86_64 kernel stack
+- [x] VGA + COM1 console
+- [x] PS/2 polling keyboard
+- [x] PCI config-space scan
+- [x] AHCI SATA disk I/O
+- [x] ATA PIO fallback
+- [x] persistent LYFS v1
+- [x] DOS-like filesystem commands
+- [x] process table + PID
+- [x] TSS and ring 3
+- [x] INT 80h syscall ABI
+- [x] linked INIT userspace program
+- [x] QEMU CI smoke test with persistent disk
+- [x] logical 20 GiB ISO
 
-## Absurdity backlog
-- FART, DOOM, MOON, LASER, NUKE
-- fake motivational diagnostics
-- random error messages
-- contradictory command aliases
-- calculator that insults bad arithmetic
-- boot-time lottery
-- WHY command with existential answers
+## 2.1 kernel work
+
+- [ ] IDT exception stubs with readable panic diagnostics
+- [ ] PIT/APIC timer
+- [ ] preemptive scheduler and context switching
+- [ ] physical page allocator
+- [ ] kernel heap
+- [ ] per-process page tables and supervisor/user separation
+- [ ] safer user-pointer validation
+- [ ] real executable loader from LYFS
+- [ ] parent/child process state and wait
+
+## 2.2 hardware
+
+- [ ] multiple AHCI ports and command slots
+- [ ] 48-bit LBA and larger disks
+- [ ] AHCI interrupts and error recovery
+- [ ] USB controller + HID
+- [ ] framebuffer discovery
+- [ ] network device + ARP/IP/ICMP
+
+## 3.x user experience
+
+- [ ] richer shell parser and command redirection
+- [ ] pipes
+- [ ] environment variables
+- [ ] real COPY, REN, wildcard matching and batch files
+- [ ] installer and disk boot
+- [ ] framebuffer GUI
+- [ ] window manager and desktop
+- [ ] .LYE applications loaded from the filesystem
+
+## The pointless department
+
+- [x] FART
+- [x] DUPA
+- [x] KURWA
+- [x] CHUJ
+- [x] DOOM
+- [x] MOON
+- [x] LASER
+- [x] NUKE
+- [x] WHY
+- [x] NOTHING
+- [x] MATRIX
+- [x] RICKROLL
+- [ ] boot-time lottery
+- [ ] fake antivirus
+- [ ] useless screensaver
+- [ ] calculator with emotional damage
+- [ ] WHY /AGAIN
+- [ ] command that changes nothing but takes 30 seconds
