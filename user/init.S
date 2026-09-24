@@ -52,3 +52,5 @@ pidmsg: .ascii "INIT: getpid() i filesystem syscall dzialaja.\n"
 fname: .ascii "RING3.TXT"
 fdata: .ascii "Ring3 napisal ten plik na prawdziwym dysku.\n"
 .equ fdata_len,.-fdata
+
+.section .note.GNU-stack,"",@progbits
