@@ -107,7 +107,19 @@ gdt64_ptr:
 
 .type arch_load_gdt,@function
 arch_load_gdt:
-    lidt (%rdi)
+    lgdt (%rdi)
+    pushq $0x08
+    lea 1f(%rip),%rax
+    pushq %rax
+    lretq
+1:
+    mov $0x10,%ax
+    mov %ax,%ds
+    mov %ax,%es
+    mov %ax,%ss
+    xor %eax,%eax
+    mov %ax,%fs
+    mov %ax,%gs
     ret
 
 .type arch_load_idt,@function
@@ -155,6 +167,7 @@ syscall_int80:
     mov %rsp,%rdi
     call syscall_handle
     test %rax,%rax
+    mov 112(%rsp),%rax
     jnz 3f
     pop %r15
     pop %r14
@@ -170,7 +183,6 @@ syscall_int80:
     pop %rdx
     pop %rcx
     pop %rbx
-    pop %rax
     iretq
 3:
     mov user_resume_rsp(%rip),%rsp
